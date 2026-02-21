@@ -1,0 +1,1998 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bibliothèque Universitaire v2 — Système Complet</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Mono:wght@300;400;500&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0c0e;
+  --surface: #111318;
+  --surface2: #181c22;
+  --surface3: #1e2330;
+  --border: #252b38;
+  --border2: #2e3548;
+  --accent: #d4a853;
+  --accent2: #f0c878;
+  --accent-dim: rgba(212,168,83,0.12);
+  --red: #e05a5a;
+  --red-dim: rgba(224,90,90,0.12);
+  --green: #4ecba0;
+  --green-dim: rgba(78,203,160,0.12);
+  --blue: #5b9fe8;
+  --blue-dim: rgba(91,159,232,0.12);
+  --purple: #9b7fe8;
+  --purple-dim: rgba(155,127,232,0.12);
+  --text: #e4dfd5;
+  --text2: #b8b0a4;
+  --muted: #6b6660;
+  --font-d: 'Playfair Display', serif;
+  --font-m: 'DM Mono', monospace;
+  --font-b: 'Crimson Pro', serif;
+  --r: 8px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-b);
+  font-size: 16px;
+  min-height: 100vh;
+}
+
+/* grain overlay */
+body::after {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:9999;
+  opacity:0.6;
+}
+
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 0%, rgba(212,168,83,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 100%, rgba(91,159,232,0.05) 0%, transparent 50%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── HEADER ── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: rgba(11,12,14,0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(212,168,83,0.3);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.logo h1 {
+  font-family: var(--font-d);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.logo span {
+  font-family: var(--font-m);
+  font-size: 0.58rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  display: block;
+  margin-top: 1px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.hstat {
+  text-align: right;
+}
+
+.hstat-n {
+  font-family: var(--font-d);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.hstat-l {
+  font-family: var(--font-m);
+  font-size: 0.55rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── SAVE INDICATOR ── */
+.save-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,100%{opacity:1} 50%{opacity:0.4}
+}
+
+/* ── LAYOUT ── */
+.app {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: calc(100vh - 64px);
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  padding: 24px 0;
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+.sb-label {
+  font-family: var(--font-m);
+  font-size: 0.55rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  padding: 0 20px 8px;
+  margin-top: 4px;
+}
+
+.nav-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 9px 20px;
+  cursor: pointer;
+  font-family: var(--font-b);
+  font-size: 0.9rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.18s;
+  position: relative;
+}
+
+.nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+
+.nav-btn.active {
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.nav-btn.active::before {
+  content:'';
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:2px;
+  background:var(--accent);
+}
+
+.nav-icon { font-size:0.9rem; width:18px; text-align:center; }
+
+.sb-divider { height:1px; background:var(--border); margin:12px 20px; }
+
+/* ── MAIN ── */
+.main {
+  padding: 36px 40px;
+  overflow-y: auto;
+}
+
+.page { display:none; animation: fadeIn 0.25s ease; }
+.page.active { display:block; }
+
+@keyframes fadeIn {
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ── PAGE HEADER ── */
+.ph {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.ph-left h2 {
+  font-family: var(--font-d);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.ph-left p {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-family: var(--font-d);
+  font-size: 1rem;
+  color: var(--accent);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── STATS GRID ── */
+.sg {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.sc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: border-color 0.2s;
+}
+
+.sc:hover { border-color: var(--border2); }
+
+.sc-n {
+  font-family: var(--font-d);
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.sc-l {
+  font-family: var(--font-m);
+  font-size: 0.58rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 5px;
+}
+
+.sc-ico {
+  position: absolute;
+  top: 14px; right: 14px;
+  font-size: 1.4rem;
+  opacity: 0.12;
+}
+
+.sc-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+/* ── FORM ── */
+.fg { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
+.fgi { display:flex; flex-direction:column; gap:5px; }
+.fgi.full { grid-column:1/-1; }
+
+label {
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+input, select, textarea {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 9px 13px;
+  color: var(--text);
+  font-family: var(--font-b);
+  font-size: 0.92rem;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  outline: none;
+  width: 100%;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(212,168,83,0.08);
+}
+
+select option { background: var(--surface2); }
+textarea { resize: vertical; min-height: 80px; }
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 9px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: var(--font-m);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.btn-p { background:var(--accent); color:#0b0c0e; font-weight:500; }
+.btn-p:hover { background:var(--accent2); transform:translateY(-1px); box-shadow:0 4px 16px rgba(212,168,83,0.25); }
+.btn-d { background:var(--red-dim); color:var(--red); border:1px solid rgba(224,90,90,0.25); }
+.btn-d:hover { background:rgba(224,90,90,0.2); }
+.btn-g { background:transparent; color:var(--muted); border:1px solid var(--border); }
+.btn-g:hover { border-color:var(--accent); color:var(--accent); }
+.btn-b { background:var(--blue-dim); color:var(--blue); border:1px solid rgba(91,159,232,0.25); }
+.btn-b:hover { background:rgba(91,159,232,0.2); }
+.btn-gr { background:var(--green-dim); color:var(--green); border:1px solid rgba(78,203,160,0.25); }
+.btn-gr:hover { background:rgba(78,203,160,0.2); }
+.btn-pu { background:var(--purple-dim); color:var(--purple); border:1px solid rgba(155,127,232,0.25); }
+.btn-pu:hover { background:rgba(155,127,232,0.2); }
+
+.btn-row { display:flex; gap:8px; margin-top:18px; flex-wrap:wrap; align-items:center; }
+
+/* ── TABLE ── */
+.tw { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; }
+th {
+  font-family:var(--font-m);
+  font-size:0.58rem;
+  text-transform:uppercase;
+  letter-spacing:0.14em;
+  color:var(--muted);
+  padding:10px 14px;
+  text-align:left;
+  border-bottom:1px solid var(--border);
+}
+
+td {
+  padding:13px 14px;
+  border-bottom:1px solid rgba(37,43,56,0.5);
+  font-size:0.9rem;
+  vertical-align:middle;
+}
+
+tr:hover td { background:rgba(212,168,83,0.02); }
+tr:last-child td { border-bottom:none; }
+
+/* ── BADGE ── */
+.badge {
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:3px 9px;
+  border-radius:20px;
+  font-family:var(--font-m);
+  font-size:0.58rem;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  font-weight:500;
+}
+
+.bg { background:var(--green-dim); color:var(--green); }
+.br { background:var(--red-dim); color:var(--red); }
+.bb { background:var(--blue-dim); color:var(--blue); }
+.ba { background:var(--accent-dim); color:var(--accent); }
+.bp { background:var(--purple-dim); color:var(--purple); }
+
+/* ── TOAST ── */
+#toast {
+  position:fixed;
+  bottom:28px; right:28px;
+  z-index:9998;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  max-width:340px;
+}
+
+.tmsg {
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-left:3px solid var(--accent);
+  padding:12px 18px;
+  border-radius:6px;
+  font-family:var(--font-m);
+  font-size:0.7rem;
+  color:var(--text);
+  animation:ti 0.3s ease;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);
+  line-height:1.5;
+}
+
+.tmsg.ok { border-left-color:var(--green); }
+.tmsg.err { border-left-color:var(--red); }
+.tmsg.info { border-left-color:var(--blue); }
+
+@keyframes ti {
+  from{opacity:0;transform:translateX(16px)}
+  to{opacity:1;transform:translateX(0)}
+}
+
+/* ── TREE ── */
+#tree-canvas {
+  display:block;
+  margin:0 auto;
+  max-width:100%;
+}
+
+/* ── MODAL ── */
+.mbg {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.75);
+  z-index:800;
+  backdrop-filter:blur(6px);
+  align-items:center;
+  justify-content:center;
+}
+
+.mbg.open { display:flex; }
+
+.modal {
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:12px;
+  padding:32px;
+  max-width:560px;
+  width:92%;
+  animation:mi 0.3s ease;
+  max-height:90vh;
+  overflow-y:auto;
+}
+
+@keyframes mi {
+  from{opacity:0;transform:scale(0.94)}
+  to{opacity:1;transform:scale(1)}
+}
+
+.modal h3 {
+  font-family:var(--font-d);
+  font-size:1.4rem;
+  color:var(--accent);
+  margin-bottom:20px;
+}
+
+/* ── EMPTY ── */
+.empty {
+  text-align:center;
+  padding:50px 20px;
+  color:var(--muted);
+}
+
+.empty .eico { font-size:2.5rem; margin-bottom:10px; }
+.empty p { font-style:italic; font-size:0.9rem; }
+
+/* ── SEARCH ── */
+.sbar { display:flex; gap:8px; margin-bottom:20px; }
+.sbar input { flex:1; }
+
+/* ── TAB ── */
+.tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:0; }
+
+.tab {
+  padding:8px 16px;
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-family:var(--font-m);
+  font-size:0.65rem;
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  color:var(--muted);
+  border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+  transition:all 0.18s;
+}
+
+.tab:hover { color:var(--text); }
+.tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+/* ── AVATAR ── */
+.avatar {
+  width:32px; height:32px;
+  border-radius:50%;
+  background:var(--accent-dim);
+  border:1px solid rgba(212,168,83,0.3);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--font-m);
+  font-size:0.65rem;
+  color:var(--accent);
+  font-weight:500;
+  flex-shrink:0;
+}
+
+/* ── PRINT ── */
+@media print {
+  body { background:#fff; color:#000; }
+  body::before, body::after { display:none; }
+  header, .sidebar, .header-actions, .btn-row, .nav-btn, #toast { display:none !important; }
+  .app { display:block; }
+  .main { padding:0; }
+  .page { display:block !important; }
+  .page:not(.print-target) { display:none !important; }
+  .card { border:1px solid #ddd; background:#fff; }
+  th { background:#f5f5f5; color:#333; }
+  td { color:#333; border-bottom:1px solid #eee; }
+  .badge { border:1px solid #ccc; color:#333; background:#f9f9f9; }
+  .sc { background:#f9f9f9; border:1px solid #ddd; }
+  .sc-n { color:#333; }
+  @page { margin:1.5cm; }
+}
+
+/* ── PROGRESS BAR ── */
+.pbar-wrap { background:var(--surface2); border-radius:4px; height:6px; overflow:hidden; }
+.pbar { height:100%; border-radius:4px; transition:width 0.4s ease; }
+
+/* ── CHIP INPUT ── */
+.chip-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.chip {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  background:var(--surface3);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  font-family:var(--font-m);
+  font-size:0.65rem;
+  color:var(--text2);
+}
+
+.chip button {
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:var(--muted);
+  padding:0;
+  font-size:0.8rem;
+  line-height:1;
+}
+
+/* ── INFO GRID ── */
+.ig { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; margin-top:14px; }
+.ig-item { }
+.ig-label { font-family:var(--font-m); font-size:0.58rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; }
+.ig-val { font-size:0.95rem; margin-top:2px; }
+
+.code { font-family:var(--font-m); color:var(--accent); font-size:0.85rem; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">📚</div>
+    <div>
+      <h1>BibliothèqueUAN</h1>
+      <span>UNIVERSITE DU FASO</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div style="display:flex;align-items:center;gap:6px">
+      <div class="save-dot" title="Auto-sauvegarde active"></div>
+      <span style="font-family:var(--font-m);font-size:0.6rem;color:var(--muted)">AUTO-SAVE</span>
+    </div>
+    <div class="hstat"><div class="hstat-n" id="h-livres">0</div><div class="hstat-l">Livres</div></div>
+    <div class="hstat"><div class="hstat-n" id="h-etudiants">0</div><div class="hstat-l">Étudiants</div></div>
+    <div class="hstat"><div class="hstat-n" id="h-emprunts">0</div><div class="hstat-l">Emprunts</div></div>
+    <div class="header-actions">
+      <button class="btn btn-gr" onclick="exportJSON()">⬇ Export JSON</button>
+      <label class="btn btn-b" style="cursor:pointer">⬆ Import JSON<input type="file" accept=".json" style="display:none" onchange="importJSON(this)"></label>
+      <button class="btn btn-pu" onclick="openPrintModal()">🖨 Rapport PDF</button>
+    </div>
+  </div>
+</header>
+
+<div class="app">
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-label">Tableau de bord</div>
+  <button class="nav-btn active" onclick="nav('dashboard',this)"><span class="nav-icon">🏛</span>Accueil</button>
+
+  <div class="sb-divider"></div>
+  <div class="sb-label">Partie 1 — Livres (ABR)</div>
+  <button class="nav-btn" onclick="nav('ajouter',this)"><span class="nav-icon">➕</span>Ajouter livre</button>
+  <button class="nav-btn" onclick="nav('catalogue',this)"><span class="nav-icon">📖</span>Catalogue</button>
+  <button class="nav-btn" onclick="nav('recherche',this)"><span class="nav-icon">🔍</span>Rechercher</button>
+  <button class="nav-btn" onclick="nav('arbre',this)"><span class="nav-icon">🌳</span>Visualiser ABR</button>
+
+  <div class="sb-divider"></div>
+  <div class="sb-label">Étudiants</div>
+  <button class="nav-btn" onclick="nav('etudiants',this)"><span class="nav-icon">👥</span>Gestion étudiants</button>
+  <button class="nav-btn" onclick="nav('ajout-etud',this)"><span class="nav-icon">➕</span>Inscrire étudiant</button>
+
+  <div class="sb-divider"></div>
+  <div class="sb-label">Partie 2 — Emprunts</div>
+  <button class="nav-btn" onclick="nav('emprunter',this)"><span class="nav-icon">🔖</span>Emprunter</button>
+  <button class="nav-btn" onclick="nav('emprunts',this)"><span class="nav-icon">📋</span>Liste emprunts</button>
+  <button class="nav-btn" onclick="nav('retour',this)"><span class="nav-icon">↩️</span>Retour livre</button>
+
+  <div class="sb-divider"></div>
+  <div class="sb-label">Partie 3 — Rapports</div>
+  <button class="nav-btn" onclick="nav('par-etudiant',this)"><span class="nav-icon">👤</span>Par étudiant</button>
+  <button class="nav-btn" onclick="nav('retards',this)"><span class="nav-icon">⏰</span>Retards</button>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- DASHBOARD -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-dashboard" class="page active">
+  <div class="ph">
+    <div class="ph-left">
+      <h2>Tableau de bord</h2>
+      <p>Vue d'ensemble — données sauvegardées automatiquement dans le navigateur</p>
+    </div>
+    <button class="btn btn-p" onclick="loadDemo()">⚡ Charger données démo</button>
+  </div>
+
+  <div class="sg">
+    <div class="sc">
+      <div class="sc-n" id="d-livres" style="color:var(--accent)">0</div>
+      <div class="sc-l">Livres enregistrés</div>
+      <div class="sc-ico">📚</div>
+      <div class="sc-bar" style="background:linear-gradient(90deg,var(--accent),transparent)"></div>
+    </div>
+    <div class="sc">
+      <div class="sc-n" id="d-etudiants" style="color:var(--blue)">0</div>
+      <div class="sc-l">Étudiants inscrits</div>
+      <div class="sc-ico">🎓</div>
+      <div class="sc-bar" style="background:linear-gradient(90deg,var(--blue),transparent)"></div>
+    </div>
+    <div class="sc">
+      <div class="sc-n" id="d-emprunts" style="color:var(--green)">0</div>
+      <div class="sc-l">Emprunts actifs</div>
+      <div class="sc-ico">🔖</div>
+      <div class="sc-bar" style="background:linear-gradient(90deg,var(--green),transparent)"></div>
+    </div>
+    <div class="sc">
+      <div class="sc-n" id="d-retards" style="color:var(--red)">0</div>
+      <div class="sc-l">Retards en cours</div>
+      <div class="sc-ico">⚠️</div>
+      <div class="sc-bar" style="background:linear-gradient(90deg,var(--red),transparent)"></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div class="card">
+      <div class="card-title">🔖 Derniers emprunts</div>
+      <div id="dash-emprunts"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Activité livres (Top empruntés)</div>
+      <div id="dash-top"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- AJOUTER LIVRE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-ajouter" class="page">
+  <div class="ph"><div class="ph-left"><h2>Ajouter un livre</h2><p>Insertion dans l'arbre binaire de recherche (ABR) par numéro</p></div></div>
+  <div class="card">
+    <div class="card-title">📘 Informations du livre</div>
+    <div class="fg">
+      <div class="fgi"><label>Numéro *</label><input type="number" id="l-num" placeholder="Ex: 1042"></div>
+      <div class="fgi"><label>Année d'édition</label><input type="number" id="l-annee" placeholder="2024"></div>
+      <div class="fgi"><label>Nom auteur *</label><input type="text" id="l-nom" placeholder="Ex: Cormen"></div>
+      <div class="fgi"><label>Prénom auteur</label><input type="text" id="l-prenom" placeholder="Ex: Thomas"></div>
+      <div class="fgi full"><label>Titre *</label><input type="text" id="l-titre" placeholder="Ex: Introduction aux algorithmes"></div>
+      <div class="fgi"><label>Exemplaires</label><input type="number" id="l-exemplaires" value="1" min="1"></div>
+      <div class="fgi full"><label>Description (optionnel)</label><textarea id="l-desc" placeholder="Résumé ou notes..."></textarea></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="ajouterLivre()">➕ Insérer dans l'ABR</button>
+      <button class="btn btn-g" onclick="clearLivreForm()">✕ Effacer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- CATALOGUE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-catalogue" class="page">
+  <div class="ph">
+    <div class="ph-left"><h2>Catalogue</h2><p>Parcours infixe de l'ABR</p></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-g" onclick="renderCatalogue('numero')">Par numéro</button>
+      <button class="btn btn-g" onclick="renderCatalogue('titre')">Alphabétique (titre)</button>
+      <button class="btn btn-g" onclick="renderCatalogue('auteur')">Alphabétique (auteur)</button>
+    </div>
+  </div>
+  <div class="sbar">
+    <input type="text" id="cat-search" placeholder="Filtrer par titre, auteur, numéro..." oninput="renderCatalogue()">
+  </div>
+  <div class="card" style="padding:0">
+    <div class="tw">
+      <table>
+        <thead><tr><th>N°</th><th>Titre</th><th>Auteur</th><th>Année</th><th>Exemplaires</th><th>Disponibles</th><th>Actions</th></tr></thead>
+        <tbody id="cat-tbody"></tbody>
+      </table>
+    </div>
+    <div id="cat-empty" class="empty" style="display:none"><div class="eico">📭</div><p>Aucun livre dans la bibliothèque</p></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- RECHERCHE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-recherche" class="page">
+  <div class="ph"><div class="ph-left"><h2>Rechercher</h2><p>Recherche dans l'ABR par numéro ou par titre</p></div></div>
+  <div class="card">
+    <div style="display:flex;gap:20px;margin-bottom:16px;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--font-b);font-size:1rem;text-transform:none;letter-spacing:0;color:var(--text)">
+        <input type="radio" name="rtype" value="numero" checked onchange="toggleSearch(this.value)"> Par numéro
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--font-b);font-size:1rem;text-transform:none;letter-spacing:0;color:var(--text)">
+        <input type="radio" name="rtype" value="titre" onchange="toggleSearch(this.value)"> Par titre
+      </label>
+    </div>
+    <div class="sbar">
+      <input type="text" id="s-input" placeholder="Numéro du livre...">
+      <button class="btn btn-p" onclick="rechercherLivre()">Rechercher</button>
+    </div>
+    <div id="s-result"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- ABR TREE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-arbre" class="page">
+  <div class="ph"><div class="ph-left"><h2>Visualisation ABR</h2><p>Arbre binaire de recherche — structure en mémoire</p></div></div>
+  <div class="card">
+    <div style="overflow-x:auto;overflow-y:auto;max-height:550px">
+      <canvas id="tree-canvas" width="1000" height="100"></canvas>
+    </div>
+    <div style="display:flex;gap:20px;margin-top:14px;font-family:var(--font-m);font-size:0.65rem;color:var(--muted);flex-wrap:wrap">
+      <span>🟡 Gauche = numéro inférieur</span>
+      <span>🟡 Droite = numéro supérieur</span>
+      <span>Survolez un nœud pour voir le titre</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- GESTION ÉTUDIANTS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-etudiants" class="page">
+  <div class="ph">
+    <div class="ph-left"><h2>Gestion des étudiants</h2><p>Liste chaînée des étudiants inscrits</p></div>
+  </div>
+  <div class="sbar">
+    <input type="text" id="etud-search" placeholder="Rechercher par nom, prénom, numéro..." oninput="renderEtudiants()">
+  </div>
+  <div class="card" style="padding:0">
+    <div class="tw">
+      <table>
+        <thead><tr><th></th><th>N° Étudiant</th><th>Nom complet</th><th>Filière</th><th>Email</th><th>Emprunts</th><th>Actions</th></tr></thead>
+        <tbody id="etud-tbody"></tbody>
+      </table>
+    </div>
+    <div id="etud-empty" class="empty" style="display:none"><div class="eico">👥</div><p>Aucun étudiant inscrit</p></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- AJOUTER ÉTUDIANT -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-ajout-etud" class="page">
+  <div class="ph"><div class="ph-left"><h2>Inscrire un étudiant</h2><p>Ajout dans la liste des étudiants</p></div></div>
+  <div class="card">
+    <div class="card-title">🎓 Informations étudiant</div>
+    <div class="fg">
+      <div class="fgi"><label>Numéro étudiant *</label><input type="text" id="e-num" placeholder="Ex: 20230045"></div>
+      <div class="fgi"><label>Nom *</label><input type="text" id="e-nom" placeholder="Ex: Sawadogo"></div>
+      <div class="fgi"><label>Prénom *</label><input type="text" id="e-prenom" placeholder="Ex: Inoussa"></div>
+      <div class="fgi"><label>Filière</label><input type="text" id="e-filiere" placeholder="Ex: L2IT"></div>
+      <div class="fgi"><label>Email</label><input type="email" id="e-email" placeholder="email@univ.bf"></div>
+      <div class="fgi"><label>Téléphone</label><input type="tel" id="e-tel" placeholder="+226..."></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="ajouterEtudiant()">➕ Inscrire</button>
+      <button class="btn btn-g" onclick="clearEtudForm()">✕ Effacer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- EMPRUNTER -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-emprunter" class="page">
+  <div class="ph"><div class="ph-left"><h2>Emprunter un livre</h2><p>Ajout dans la liste chaînée des emprunts</p></div></div>
+  <div class="card">
+    <div class="card-title">📋 Formulaire d'emprunt</div>
+    <div class="fg">
+      <div class="fgi">
+        <label>Numéro du livre *</label>
+        <input type="number" id="em-livre" placeholder="N° du livre" oninput="previewLivre()">
+        <div id="em-livre-preview" style="margin-top:6px;font-size:0.82rem;color:var(--muted);font-style:italic"></div>
+      </div>
+      <div class="fgi">
+        <label>Numéro étudiant *</label>
+        <input type="text" id="em-etuid" placeholder="N° étudiant" oninput="previewEtud()">
+        <div id="em-etud-preview" style="margin-top:6px;font-size:0.82rem;color:var(--muted);font-style:italic"></div>
+      </div>
+      <div class="fgi"><label>Date d'emprunt</label><input type="date" id="em-debut"></div>
+      <div class="fgi"><label>Date de retour prévue *</label><input type="date" id="em-fin"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="enregistrerEmprunt()">🔖 Enregistrer l'emprunt</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- LISTE EMPRUNTS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-emprunts" class="page">
+  <div class="ph">
+    <div class="ph-left"><h2>Liste des emprunts</h2><p>Liste chaînée — emprunts en cours</p></div>
+    <button class="btn btn-pu" onclick="printPage('emprunts')">🖨 Imprimer</button>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="filterEmprunts('tous',this)">Tous</button>
+    <button class="tab" onclick="filterEmprunts('cours',this)">En cours</button>
+    <button class="tab" onclick="filterEmprunts('retard',this)">En retard</button>
+  </div>
+  <div class="card" style="padding:0">
+    <div class="tw">
+      <table>
+        <thead><tr><th>N° Livre</th><th>Titre</th><th>Étudiant</th><th>Emprunt</th><th>Retour prévu</th><th>Statut</th><th></th></tr></thead>
+        <tbody id="emp-tbody"></tbody>
+      </table>
+    </div>
+    <div id="emp-empty" class="empty" style="display:none"><div class="eico">📭</div><p>Aucun emprunt en cours</p></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- RETOUR -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-retour" class="page">
+  <div class="ph"><div class="ph-left"><h2>Retour d'un livre</h2><p>Suppression du nœud dans la liste chaînée</p></div></div>
+  <div class="card">
+    <div class="card-title">↩️ Identifier le retour</div>
+    <div class="fg">
+      <div class="fgi"><label>Numéro du livre</label><input type="number" id="r-livre" placeholder="N° du livre"></div>
+      <div class="fgi"><label>Numéro étudiant</label><input type="text" id="r-etuid" placeholder="N° étudiant"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-p" onclick="traiterRetour()">↩️ Valider le retour</button>
+    </div>
+    <div id="r-result" style="margin-top:16px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Emprunts actifs (cliquer pour retour rapide)</div>
+    <div class="tw"><table>
+      <thead><tr><th>N° Livre</th><th>Titre</th><th>Étudiant</th><th>Retour prévu</th><th></th></tr></thead>
+      <tbody id="retour-list"></tbody>
+    </table></div>
+    <div id="retour-empty" class="empty" style="display:none"><div class="eico">✅</div><p>Aucun emprunt actif</p></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PAR ÉTUDIANT -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-par-etudiant" class="page">
+  <div class="ph"><div class="ph-left"><h2>Emprunts par étudiant</h2><p>Historique filtré</p></div></div>
+  <div class="sbar">
+    <input type="text" id="pe-input" placeholder="Numéro ou nom de l'étudiant...">
+    <button class="btn btn-p" onclick="filtrerEtudiant()">Afficher</button>
+  </div>
+  <div id="pe-result"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- RETARDS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="page-retards" class="page">
+  <div class="ph">
+    <div class="ph-left"><h2>Livres non retournés</h2><p>Emprunts dépassant la date de retour</p></div>
+    <button class="btn btn-pu" onclick="printPage('retards')">🖨 Imprimer</button>
+  </div>
+  <div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:20px;flex-wrap:wrap">
+    <div class="fgi" style="flex:1;min-width:180px"><label>Date de référence</label><input type="date" id="ret-date"></div>
+    <button class="btn btn-p" onclick="afficherRetards()">Afficher les retards</button>
+  </div>
+  <div id="ret-result"></div>
+</div>
+
+</main>
+</div>
+
+<!-- PRINT MODAL -->
+<div class="mbg" id="print-modal">
+  <div class="modal">
+    <h3>🖨 Générer un rapport PDF</h3>
+    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:20px">Choisissez le type de rapport à imprimer. Le navigateur ouvrira la boîte de dialogue d'impression.</p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-p" style="text-align:left;padding:14px 18px" onclick="printReport('catalogue')">📖 Catalogue complet des livres</button>
+      <button class="btn btn-b" style="text-align:left;padding:14px 18px" onclick="printReport('etudiants')">🎓 Liste des étudiants inscrits</button>
+      <button class="btn btn-gr" style="text-align:left;padding:14px 18px" onclick="printReport('emprunts')">🔖 Emprunts en cours</button>
+      <button class="btn btn-d" style="text-align:left;padding:14px 18px" onclick="printReport('retards')">⚠️ Rapport des retards</button>
+      <button class="btn btn-pu" style="text-align:left;padding:14px 18px" onclick="printReport('complet')">📊 Rapport général complet</button>
+    </div>
+    <div class="btn-row" style="margin-top:20px">
+      <button class="btn btn-g" onclick="closePrintModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENT DETAIL MODAL -->
+<div class="mbg" id="etud-modal">
+  <div class="modal">
+    <h3 id="em-title">Fiche étudiant</h3>
+    <div id="em-content"></div>
+    <div class="btn-row">
+      <button class="btn btn-d" id="em-del-btn">🗑 Supprimer</button>
+      <button class="btn btn-g" onclick="closeModal('etud-modal')">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- PRINT FRAME (hidden) -->
+<div id="print-area" style="display:none"></div>
+
+<script>
+// ============================================================
+// ABR
+// ============================================================
+class NodeABR {
+  constructor(livre) { this.livre = livre; this.g = null; this.d = null; }
+}
+
+class ABR {
+  constructor() { this.racine = null; }
+
+  inserer(livre) {
+    const n = new NodeABR(livre);
+    if (!this.racine) { this.racine = n; return true; }
+    let c = this.racine;
+    while (true) {
+      if (livre.numero === c.livre.numero) return false;
+      if (livre.numero < c.livre.numero) {
+        if (!c.g) { c.g = n; return true; } c = c.g;
+      } else {
+        if (!c.d) { c.d = n; return true; } c = c.d;
+      }
+    }
+  }
+
+  rechercherNum(num) {
+    let c = this.racine;
+    while (c) {
+      if (num === c.livre.numero) return c.livre;
+      c = num < c.livre.numero ? c.g : c.d;
+    }
+    return null;
+  }
+
+  rechercherTitre(t) {
+    const r = [];
+    const f = (n) => { if (!n) return; if (n.livre.titre.toLowerCase().includes(t.toLowerCase())) r.push(n.livre); f(n.g); f(n.d); };
+    f(this.racine); return r;
+  }
+
+  infixe() {
+    const r = [];
+    const v = (n) => { if (!n) return; v(n.g); r.push(n.livre); v(n.d); };
+    v(this.racine); return r;
+  }
+
+  supprimer(num) {
+    const del = (n, num) => {
+      if (!n) return null;
+      if (num < n.livre.numero) { n.g = del(n.g, num); }
+      else if (num > n.livre.numero) { n.d = del(n.d, num); }
+      else {
+        if (!n.g) return n.d;
+        if (!n.d) return n.g;
+        // Find min in right
+        let min = n.d;
+        while (min.g) min = min.g;
+        n.livre = min.livre;
+        n.d = del(n.d, min.livre.numero);
+      }
+      return n;
+    };
+    this.racine = del(this.racine, num);
+  }
+
+  count() { return this.infixe().length; }
+  toArray() { return this.infixe(); }
+}
+
+// ============================================================
+// LISTE CHAÎNÉE EMPRUNTS
+// ============================================================
+class NoeudEmp { constructor(e) { this.e = e; this.s = null; } }
+class ListeEmp {
+  constructor() { this.tete = null; }
+  ajouter(e) { const n = new NoeudEmp(e); n.s = this.tete; this.tete = n; }
+  toArray() { const r = []; let c = this.tete; while (c) { r.push(c.e); c = c.s; } return r; }
+  supprimer(numL, numE) {
+    let p = null, c = this.tete;
+    while (c) {
+      if (c.e.numLivre === numL && c.e.numEtudiant === numE) {
+        if (p) p.s = c.s; else this.tete = c.s;
+        return c.e;
+      }
+      p = c; c = c.s;
+    }
+    return null;
+  }
+  count() { return this.toArray().length; }
+}
+
+// ============================================================
+// ÉTAT GLOBAL
+// ============================================================
+const abr = new ABR();
+const emprunts = new ListeEmp();
+let etudiants = []; // Simple array pour les étudiants
+let catSort = 'numero';
+
+// ============================================================
+// PERSISTANCE LOCALSTORAGE
+// ============================================================
+function sauvegarder() {
+  try {
+    localStorage.setItem('bib_livres', JSON.stringify(abr.toArray()));
+    localStorage.setItem('bib_emprunts', JSON.stringify(emprunts.toArray()));
+    localStorage.setItem('bib_etudiants', JSON.stringify(etudiants));
+  } catch(e) { console.warn('LocalStorage indisponible'); }
+}
+
+function chargerDepuisStorage() {
+  try {
+    const livres = JSON.parse(localStorage.getItem('bib_livres') || '[]');
+    const emps = JSON.parse(localStorage.getItem('bib_emprunts') || '[]');
+    const etuds = JSON.parse(localStorage.getItem('bib_etudiants') || '[]');
+    livres.forEach(l => abr.inserer(l));
+    emps.forEach(e => emprunts.ajouter(e));
+    etudiants = etuds;
+    updateAll();
+    if (livres.length) toast(`💾 ${livres.length} livres, ${etuds.length} étudiants restaurés depuis la mémoire`, 'info');
+  } catch(e) {}
+}
+
+// ============================================================
+// EXPORT / IMPORT JSON
+// ============================================================
+function exportJSON() {
+  const data = {
+    version: 2,
+    date: new Date().toISOString(),
+    livres: abr.toArray(),
+    etudiants,
+    emprunts: emprunts.toArray()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `bibliotheque_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  toast('✅ Données exportées en JSON', 'ok');
+}
+
+function importJSON(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      let lCount = 0, eCount = 0, emCount = 0;
+      (data.livres || []).forEach(l => { if (abr.inserer(l)) lCount++; });
+      (data.etudiants || []).forEach(et => {
+        if (!etudiants.find(x => x.numero === et.numero)) { etudiants.push(et); eCount++; }
+      });
+      (data.emprunts || []).forEach(em => { emprunts.ajouter(em); emCount++; });
+      sauvegarder();
+      updateAll();
+      toast(`✅ Import réussi: ${lCount} livres, ${eCount} étudiants, ${emCount} emprunts`, 'ok');
+    } catch(err) { toast('❌ Fichier JSON invalide', 'err'); }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function nav(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  // Actions spéciales
+  const actions = {
+    'catalogue': () => renderCatalogue(),
+    'arbre': drawTree,
+    'emprunts': renderEmprunts,
+    'etudiants': renderEtudiants,
+    'retour': renderRetourList,
+    'dashboard': updateDashboard,
+  };
+  if (actions[id]) actions[id]();
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  const d = document.createElement('div');
+  d.className = 'tmsg ' + type;
+  d.textContent = msg;
+  t.appendChild(d);
+  setTimeout(() => { d.style.opacity = '0'; d.style.transform = 'translateX(16px)'; d.style.transition = '0.3s'; setTimeout(() => d.remove(), 300); }, 3200);
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+const today = () => new Date().toISOString().split('T')[0];
+const initials = (nom, prenom) => ((nom||'')[0]||'') + ((prenom||'')[0]||'');
+const diasLeft = (fin) => Math.ceil((new Date(fin) - new Date()) / 86400000);
+
+function getDisponibles(numLivre) {
+  const l = abr.rechercherNum(numLivre);
+  if (!l) return 0;
+  const emp = emprunts.toArray().filter(e => e.numLivre === numLivre).length;
+  return Math.max(0, l.exemplaires - emp);
+}
+
+function updateAll() { updateStats(); }
+
+function updateStats() {
+  const total = abr.count();
+  const emps = emprunts.toArray();
+  const td = today();
+  const retards = emps.filter(e => e.fin < td).length;
+  let dispo = 0;
+  abr.toArray().forEach(l => { dispo += getDisponibles(l.numero); });
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('h-livres', total);
+  set('h-etudiants', etudiants.length);
+  set('h-emprunts', emps.length);
+  set('d-livres', total);
+  set('d-etudiants', etudiants.length);
+  set('d-emprunts', emps.length);
+  set('d-retards', retards);
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function updateDashboard() {
+  updateStats();
+
+  // Derniers emprunts
+  const emps = emprunts.toArray().slice(0, 6);
+  const de = document.getElementById('dash-emprunts');
+  if (!emps.length) {
+    de.innerHTML = '<div class="empty" style="padding:20px"><div class="eico" style="font-size:1.8rem">📭</div><p>Aucun emprunt</p></div>';
+  } else {
+    de.innerHTML = emps.map(e => {
+      const l = abr.rechercherNum(e.numLivre);
+      const retard = e.fin < today();
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div class="avatar">${initials(e.nom, e.prenom)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:0.88rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l ? l.titre : 'N°'+e.numLivre}</div>
+          <div style="font-family:var(--font-m);font-size:0.6rem;color:var(--muted)">${e.nom} ${e.prenom} · ${e.fin}</div>
+        </div>
+        ${retard ? '<span class="badge br">Retard</span>' : '<span class="badge bb">En cours</span>'}
+      </div>`;
+    }).join('');
+  }
+
+  // Top livres
+  const countByLivre = {};
+  emprunts.toArray().forEach(e => { countByLivre[e.numLivre] = (countByLivre[e.numLivre]||0) + 1; });
+  const top = Object.entries(countByLivre).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const dt = document.getElementById('dash-top');
+  if (!top.length) {
+    dt.innerHTML = '<div class="empty" style="padding:20px"><div class="eico" style="font-size:1.8rem">📊</div><p>Aucune donnée</p></div>';
+  } else {
+    const maxVal = top[0][1];
+    dt.innerHTML = top.map(([num, cnt]) => {
+      const l = abr.rechercherNum(parseInt(num));
+      return `<div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:4px">
+          <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">${l ? l.titre : 'N°'+num}</span>
+          <span class="code">${cnt}×</span>
+        </div>
+        <div class="pbar-wrap"><div class="pbar" style="width:${(cnt/maxVal*100)}%;background:var(--accent)"></div></div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ============================================================
+// LIVRES — AJOUTER
+// ============================================================
+function ajouterLivre() {
+  const num = parseInt(document.getElementById('l-num').value);
+  const titre = document.getElementById('l-titre').value.trim();
+  const nom = document.getElementById('l-nom').value.trim();
+  const prenom = document.getElementById('l-prenom').value.trim();
+  const annee = parseInt(document.getElementById('l-annee').value) || new Date().getFullYear();
+  const exemplaires = parseInt(document.getElementById('l-exemplaires').value) || 1;
+  const desc = document.getElementById('l-desc').value.trim();
+
+  if (!num || !titre || !nom) { toast('Champs obligatoires: numéro, titre, nom auteur', 'err'); return; }
+
+  const ok = abr.inserer({ numero: num, titre, nom, prenom, annee, exemplaires, desc });
+  if (!ok) { toast(`Livre n°${num} déjà dans l'ABR`, 'err'); return; }
+
+  sauvegarder();
+  toast(`✅ "${titre}" inséré dans l'ABR`, 'ok');
+  clearLivreForm();
+  updateStats();
+}
+
+function clearLivreForm() {
+  ['l-num','l-titre','l-nom','l-prenom','l-annee','l-desc'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('l-exemplaires').value = 1;
+}
+
+// ============================================================
+// CATALOGUE
+// ============================================================
+function renderCatalogue(tri) {
+  if (tri) catSort = tri;
+  let livres = abr.infixe();
+  const q = (document.getElementById('cat-search').value || '').toLowerCase();
+  if (q) livres = livres.filter(l =>
+    l.titre.toLowerCase().includes(q) ||
+    l.nom.toLowerCase().includes(q) ||
+    String(l.numero).includes(q)
+  );
+  if (catSort === 'titre') livres.sort((a,b) => a.titre.localeCompare(b.titre));
+  if (catSort === 'auteur') livres.sort((a,b) => a.nom.localeCompare(b.nom));
+
+  const tbody = document.getElementById('cat-tbody');
+  const empty = document.getElementById('cat-empty');
+
+  if (!livres.length) { tbody.innerHTML = ''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = livres.map(l => {
+    const dispo = getDisponibles(l.numero);
+    const pct = Math.round(dispo / l.exemplaires * 100);
+    return `<tr>
+      <td><span class="code">${l.numero}</span></td>
+      <td><div style="font-weight:600">${l.titre}</div>${l.desc ? `<div style="font-size:0.78rem;color:var(--muted);margin-top:2px">${l.desc.substring(0,60)}${l.desc.length>60?'…':''}</div>` : ''}</td>
+      <td>${l.nom} ${l.prenom}</td>
+      <td><span style="font-family:var(--font-m);font-size:0.8rem">${l.annee}</span></td>
+      <td style="text-align:center">${l.exemplaires}</td>
+      <td>
+        <span class="badge ${dispo > 0 ? 'bg' : 'br'}">${dispo}/${l.exemplaires}</span>
+        <div class="pbar-wrap" style="margin-top:4px;width:60px"><div class="pbar" style="width:${pct}%;background:${dispo>0?'var(--green)':'var(--red)'}"></div></div>
+      </td>
+      <td>
+        <button class="btn btn-g" style="padding:5px 10px;font-size:0.6rem" onclick="supprimerLivre(${l.numero})">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function supprimerLivre(num) {
+  const emp = emprunts.toArray().filter(e => e.numLivre === num).length;
+  if (emp > 0) { toast(`Impossible: ${emp} emprunt(s) actif(s) pour ce livre`, 'err'); return; }
+  if (!confirm(`Supprimer le livre n°${num} de l'ABR ?`)) return;
+  abr.supprimer(num);
+  sauvegarder();
+  renderCatalogue();
+  updateStats();
+  toast('🗑 Livre supprimé de l\'ABR', 'ok');
+}
+
+// ============================================================
+// RECHERCHE
+// ============================================================
+function toggleSearch(val) {
+  const inp = document.getElementById('s-input');
+  inp.placeholder = val === 'numero' ? 'Numéro du livre...' : 'Titre ou partie du titre...';
+  inp.type = val === 'numero' ? 'number' : 'text';
+  document.getElementById('s-result').innerHTML = '';
+}
+
+function rechercherLivre() {
+  const type = document.querySelector('input[name="rtype"]:checked').value;
+  const val = document.getElementById('s-input').value.trim();
+  const div = document.getElementById('s-result');
+  if (!val) { toast('Entrez une valeur de recherche', 'err'); return; }
+
+  const makeCard = (l) => {
+    const dispo = getDisponibles(l.numero);
+    return `<div class="card" style="border-color:var(--accent);margin-top:14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-family:var(--font-d);font-size:1.3rem">${l.titre}</div>
+          <div style="color:var(--muted);font-style:italic;margin-top:3px">${l.nom} ${l.prenom}, ${l.annee}</div>
+          ${l.desc ? `<div style="margin-top:8px;font-size:0.88rem;color:var(--text2)">${l.desc}</div>` : ''}
+        </div>
+        <span class="code" style="font-size:1rem">N° ${l.numero}</span>
+      </div>
+      <div style="display:flex;gap:20px;margin-top:14px;flex-wrap:wrap">
+        <div><div class="ig-label">Exemplaires</div><div>${l.exemplaires}</div></div>
+        <div><div class="ig-label">Disponibles</div><div><span class="badge ${dispo>0?'bg':'br'}">${dispo}</span></div></div>
+      </div>
+    </div>`;
+  };
+
+  if (type === 'numero') {
+    const l = abr.rechercherNum(parseInt(val));
+    div.innerHTML = l ? makeCard(l) : `<div class="empty"><div class="eico">❌</div><p>Livre n°${val} introuvable dans l'ABR</p></div>`;
+  } else {
+    const res = abr.rechercherTitre(val);
+    div.innerHTML = res.length ? res.map(makeCard).join('') : `<div class="empty"><div class="eico">❌</div><p>Aucun livre trouvé pour "${val}"</p></div>`;
+  }
+}
+
+// ============================================================
+// ARBRE — DESSIN CANVAS
+// ============================================================
+function drawTree() {
+  const canvas = document.getElementById('tree-canvas');
+  const ctx = canvas.getContext('2d');
+
+  if (!abr.racine) {
+    canvas.height = 120;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = '#6b6660';
+    ctx.font = '13px DM Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('Arbre vide — Ajoutez des livres pour voir la structure', canvas.width/2, 60);
+    return;
+  }
+
+  const depth = (n) => !n ? 0 : 1 + Math.max(depth(n.g), depth(n.d));
+  const d = depth(abr.racine);
+  const h = Math.max(200, d * 90 + 60);
+  canvas.height = h;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const R = 24;
+  const draw = (n, x, y, xOff) => {
+    if (!n) return;
+    const lx = x - xOff, ly = y + 85;
+    const rx = x + xOff, ry = y + 85;
+
+    const drawLine = (x1,y1,x2,y2) => {
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+      ctx.strokeStyle = '#252b38'; ctx.lineWidth = 1.5; ctx.stroke();
+    };
+
+    if (n.g) drawLine(x, y+R, lx, ly-R);
+    if (n.d) drawLine(x, y+R, rx, ry-R);
+
+    // Shadow
+    ctx.shadowColor = 'rgba(212,168,83,0.2)';
+    ctx.shadowBlur = 10;
+
+    // Circle
+    ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI*2);
+    ctx.fillStyle = '#181c22'; ctx.fill();
+    ctx.strokeStyle = '#d4a853'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Number
+    ctx.fillStyle = '#d4a853';
+    ctx.font = 'bold 10px DM Mono, monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(n.livre.numero, x, y - 3);
+
+    // Short title
+    const t = n.livre.titre.length > 7 ? n.livre.titre.substring(0,7)+'…' : n.livre.titre;
+    ctx.fillStyle = '#6b6660'; ctx.font = '7px DM Mono, monospace';
+    ctx.fillText(t, x, y + 8);
+
+    draw(n.g, lx, ly, Math.max(xOff/2, 30));
+    draw(n.d, rx, ry, Math.max(xOff/2, 30));
+  };
+
+  draw(abr.racine, canvas.width/2, 40, canvas.width/4);
+}
+
+// ============================================================
+// ÉTUDIANTS
+// ============================================================
+function ajouterEtudiant() {
+  const num = document.getElementById('e-num').value.trim();
+  const nom = document.getElementById('e-nom').value.trim();
+  const prenom = document.getElementById('e-prenom').value.trim();
+  const filiere = document.getElementById('e-filiere').value.trim();
+  const email = document.getElementById('e-email').value.trim();
+  const tel = document.getElementById('e-tel').value.trim();
+
+  if (!num || !nom || !prenom) { toast('Champs obligatoires: numéro, nom, prénom', 'err'); return; }
+  if (etudiants.find(e => e.numero === num)) { toast(`Étudiant ${num} déjà inscrit`, 'err'); return; }
+
+  etudiants.push({ numero: num, nom, prenom, filiere, email, tel });
+  sauvegarder();
+  toast(`✅ ${nom} ${prenom} inscrit(e)`, 'ok');
+  clearEtudForm();
+  updateStats();
+}
+
+function clearEtudForm() {
+  ['e-num','e-nom','e-prenom','e-filiere','e-email','e-tel'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+}
+
+function renderEtudiants() {
+  const q = (document.getElementById('etud-search').value || '').toLowerCase();
+  let liste = etudiants.filter(e =>
+    !q ||
+    e.nom.toLowerCase().includes(q) ||
+    e.prenom.toLowerCase().includes(q) ||
+    e.numero.toLowerCase().includes(q)
+  );
+
+  const tbody = document.getElementById('etud-tbody');
+  const empty = document.getElementById('etud-empty');
+
+  if (!liste.length) { tbody.innerHTML = ''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = liste.map(e => {
+    const emps = emprunts.toArray().filter(em => em.numEtudiant === e.numero).length;
+    return `<tr>
+      <td><div class="avatar">${initials(e.nom, e.prenom)}</div></td>
+      <td><span class="code">${e.numero}</span></td>
+      <td><strong>${e.nom}</strong> ${e.prenom}</td>
+      <td>${e.filiere || '—'}</td>
+      <td style="font-size:0.82rem">${e.email || '—'}</td>
+      <td><span class="badge ${emps>0?'bb':'ba'}">${emps}</span></td>
+      <td>
+        <button class="btn btn-g" style="padding:5px 10px;font-size:0.6rem" onclick="showEtudiant('${e.numero}')">Détail</button>
+        <button class="btn btn-d" style="padding:5px 10px;font-size:0.6rem;margin-left:4px" onclick="supprimerEtudiant('${e.numero}')">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function showEtudiant(num) {
+  const e = etudiants.find(x => x.numero === num);
+  if (!e) return;
+  const emps = emprunts.toArray().filter(em => em.numEtudiant === num);
+  const td = today();
+
+  document.getElementById('em-title').textContent = `${e.nom} ${e.prenom}`;
+  document.getElementById('em-content').innerHTML = `
+    <div class="ig">
+      <div class="ig-item"><div class="ig-label">N° Étudiant</div><div class="code">${e.numero}</div></div>
+      <div class="ig-item"><div class="ig-label">Filière</div><div>${e.filiere||'—'}</div></div>
+      <div class="ig-item"><div class="ig-label">Email</div><div style="font-size:0.85rem">${e.email||'—'}</div></div>
+      <div class="ig-item"><div class="ig-label">Téléphone</div><div>${e.tel||'—'}</div></div>
+    </div>
+    <div style="margin-top:20px">
+      <div class="ig-label" style="margin-bottom:10px">Emprunts en cours (${emps.length})</div>
+      ${emps.length ? emps.map(em => {
+        const l = abr.rechercherNum(em.numLivre);
+        const retard = em.fin < td;
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.88rem">
+          <span>${l ? l.titre : 'N°'+em.numLivre}</span>
+          <span class="badge ${retard?'br':'bb'}">${retard?'Retard':'En cours'}</span>
+        </div>`;
+      }).join('') : '<div style="color:var(--muted);font-style:italic;font-size:0.88rem">Aucun emprunt actif</div>'}
+    </div>
+  `;
+  document.getElementById('em-del-btn').onclick = () => { supprimerEtudiant(num); closeModal('etud-modal'); };
+  document.getElementById('etud-modal').classList.add('open');
+}
+
+function supprimerEtudiant(num) {
+  const emps = emprunts.toArray().filter(e => e.numEtudiant === num).length;
+  if (emps > 0) { toast(`Impossible: ${emps} emprunt(s) actif(s)`, 'err'); return; }
+  if (!confirm('Supprimer cet étudiant ?')) return;
+  etudiants = etudiants.filter(e => e.numero !== num);
+  sauvegarder();
+  renderEtudiants();
+  updateStats();
+  toast('🗑 Étudiant supprimé', 'ok');
+}
+
+// ============================================================
+// EMPRUNTS — EMPRUNTER
+// ============================================================
+function previewLivre() {
+  const num = parseInt(document.getElementById('em-livre').value);
+  const div = document.getElementById('em-livre-preview');
+  const l = abr.rechercherNum(num);
+  if (!l) { div.textContent = num ? '❌ Livre introuvable' : ''; div.style.color='var(--red)'; return; }
+  const d = getDisponibles(num);
+  div.innerHTML = `<span style="color:var(--green)">✓ ${l.titre}</span> <span style="color:var(--muted)">— ${d} dispo</span>`;
+  div.style.color = '';
+}
+
+function previewEtud() {
+  const id = document.getElementById('em-etuid').value.trim();
+  const div = document.getElementById('em-etud-preview');
+  const e = etudiants.find(x => x.numero === id);
+  if (!e) { div.textContent = id ? '⚠ Étudiant non inscrit (sera créé automatiquement)' : ''; div.style.color='var(--muted)'; return; }
+  div.innerHTML = `<span style="color:var(--green)">✓ ${e.nom} ${e.prenom}</span>`;
+}
+
+function enregistrerEmprunt() {
+  const numLivre = parseInt(document.getElementById('em-livre').value);
+  const numEtudiant = document.getElementById('em-etuid').value.trim();
+  const debut = document.getElementById('em-debut').value || today();
+  const fin = document.getElementById('em-fin').value;
+
+  if (!numLivre || !numEtudiant || !fin) { toast('Champs requis: livre, étudiant, date retour', 'err'); return; }
+
+  const l = abr.rechercherNum(numLivre);
+  if (!l) { toast(`Livre n°${numLivre} introuvable dans l'ABR`, 'err'); return; }
+
+  if (getDisponibles(numLivre) === 0) { toast('Aucun exemplaire disponible', 'err'); return; }
+
+  const deja = emprunts.toArray().find(e => e.numLivre === numLivre && e.numEtudiant === numEtudiant);
+  if (deja) { toast('Cet étudiant a déjà emprunté ce livre', 'err'); return; }
+
+  if (fin < debut) { toast('La date de retour doit être postérieure à l\'emprunt', 'err'); return; }
+
+  // Auto-créer l'étudiant si inconnu
+  let etud = etudiants.find(e => e.numero === numEtudiant);
+  if (!etud) {
+    const nom = prompt('Étudiant inconnu. Entrez son nom:');
+    const prenom = prompt('Entrez son prénom:');
+    if (!nom || !prenom) { toast('Emprunt annulé', 'err'); return; }
+    etud = { numero: numEtudiant, nom, prenom, filiere:'', email:'', tel:'' };
+    etudiants.push(etud);
+  }
+
+  emprunts.ajouter({ numLivre, numEtudiant, nom: etud.nom, prenom: etud.prenom, debut, fin });
+  sauvegarder();
+  toast(`✅ Emprunt: "${l.titre}" → ${etud.nom} ${etud.prenom}`, 'ok');
+  ['em-livre','em-etuid','em-fin'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('em-livre-preview').textContent = '';
+  document.getElementById('em-etud-preview').textContent = '';
+  updateStats();
+}
+
+// ============================================================
+// LISTE EMPRUNTS
+// ============================================================
+let empFilter = 'tous';
+
+function filterEmprunts(f, btn) {
+  empFilter = f;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderEmprunts();
+}
+
+function renderEmprunts() {
+  let list = emprunts.toArray();
+  const td = today();
+  if (empFilter === 'cours') list = list.filter(e => e.fin >= td);
+  if (empFilter === 'retard') list = list.filter(e => e.fin < td);
+
+  const tbody = document.getElementById('emp-tbody');
+  const empty = document.getElementById('emp-empty');
+  if (!list.length) { tbody.innerHTML = ''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = list.map(e => {
+    const l = abr.rechercherNum(e.numLivre);
+    const retard = e.fin < td;
+    const jours = diasLeft(e.fin);
+    return `<tr>
+      <td><span class="code">${e.numLivre}</span></td>
+      <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l ? l.titre : '—'}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="width:26px;height:26px;font-size:0.55rem">${initials(e.nom,e.prenom)}</div>${e.nom} ${e.prenom}</div></td>
+      <td style="font-family:var(--font-m);font-size:0.75rem">${e.debut}</td>
+      <td style="font-family:var(--font-m);font-size:0.75rem;color:${retard?'var(--red)':'inherit'}">${e.fin}</td>
+      <td>${retard ? `<span class="badge br">+${Math.abs(jours)}j retard</span>` : `<span class="badge bb">${jours}j restants</span>`}</td>
+      <td><button class="btn btn-d" style="padding:5px 10px;font-size:0.6rem" onclick="retourRapide(${e.numLivre},'${e.numEtudiant}')">↩ Retour</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function retourRapide(numLivre, numEtudiant) {
+  const emp = emprunts.supprimer(numLivre, numEtudiant);
+  if (emp) {
+    sauvegarder();
+    renderEmprunts();
+    renderRetourList();
+    updateStats();
+    toast('↩️ Retour enregistré', 'ok');
+  }
+}
+
+// ============================================================
+// RETOUR
+// ============================================================
+function renderRetourList() {
+  const list = emprunts.toArray();
+  const tbody = document.getElementById('retour-list');
+  const empty = document.getElementById('retour-empty');
+  const td = today();
+  if (!list.length) { tbody.innerHTML = ''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  tbody.innerHTML = list.map(e => {
+    const l = abr.rechercherNum(e.numLivre);
+    const retard = e.fin < td;
+    return `<tr>
+      <td><span class="code">${e.numLivre}</span></td>
+      <td>${l ? l.titre : '—'}</td>
+      <td>${e.nom} ${e.prenom} <span style="font-family:var(--font-m);font-size:0.65rem;color:var(--muted)">(${e.numEtudiant})</span></td>
+      <td style="font-family:var(--font-m);font-size:0.75rem;color:${retard?'var(--red)':'inherit'}">${e.fin}</td>
+      <td><button class="btn btn-p" style="padding:5px 12px;font-size:0.6rem" onclick="retourRapide(${e.numLivre},'${e.numEtudiant}')">↩ Retour</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function traiterRetour() {
+  const numLivre = parseInt(document.getElementById('r-livre').value);
+  const numEtudiant = document.getElementById('r-etuid').value.trim();
+  const div = document.getElementById('r-result');
+  if (!numLivre || !numEtudiant) { toast('Entrez le n° du livre et de l\'étudiant', 'err'); return; }
+
+  const emp = emprunts.supprimer(numLivre, numEtudiant);
+  if (!emp) {
+    div.innerHTML = `<div style="color:var(--red);padding:12px;border:1px solid rgba(224,90,90,0.2);border-radius:6px">❌ Aucun emprunt trouvé</div>`;
+    return;
+  }
+  const l = abr.rechercherNum(numLivre);
+  div.innerHTML = `<div style="color:var(--green);padding:14px;border:1px solid rgba(78,203,160,0.2);border-radius:6px">
+    ✅ Retour validé !<br>
+    <span style="font-family:var(--font-m);font-size:0.7rem;color:var(--muted)">${l?l.titre:numLivre} · ${emp.nom} ${emp.prenom}</span>
+  </div>`;
+  sauvegarder();
+  renderRetourList();
+  updateStats();
+  toast('↩️ Retour validé', 'ok');
+}
+
+// ============================================================
+// PAR ÉTUDIANT
+// ============================================================
+function filtrerEtudiant() {
+  const q = document.getElementById('pe-input').value.trim();
+  const div = document.getElementById('pe-result');
+  if (!q) { toast('Entrez un numéro ou un nom', 'err'); return; }
+  const td = today();
+
+  // Chercher par numéro ou nom
+  const emps = emprunts.toArray().filter(e =>
+    e.numEtudiant === q ||
+    e.nom.toLowerCase().includes(q.toLowerCase()) ||
+    e.prenom.toLowerCase().includes(q.toLowerCase())
+  );
+
+  if (!emps.length) {
+    div.innerHTML = `<div class="empty"><div class="eico">📭</div><p>Aucun emprunt pour "${q}"</p></div>`;
+    return;
+  }
+
+  const etud = etudiants.find(e => e.numero === emps[0].numEtudiant || e.nom.toLowerCase().includes(q.toLowerCase()));
+  div.innerHTML = `
+    ${etud ? `<div class="card" style="border-color:var(--blue);margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="avatar" style="width:48px;height:48px;font-size:1rem">${initials(etud.nom,etud.prenom)}</div>
+        <div>
+          <div style="font-family:var(--font-d);font-size:1.2rem">${etud.nom} ${etud.prenom}</div>
+          <div style="font-family:var(--font-m);font-size:0.65rem;color:var(--muted)">N° ${etud.numero} · ${etud.filiere||'—'}</div>
+        </div>
+        <span class="badge bb" style="margin-left:auto">${emps.length} emprunt(s)</span>
+      </div>
+    </div>` : ''}
+    <div class="card" style="padding:0"><div class="tw"><table>
+      <thead><tr><th>N° Livre</th><th>Titre</th><th>Emprunt</th><th>Retour prévu</th><th>Statut</th></tr></thead>
+      <tbody>
+      ${emps.map(e => {
+        const l = abr.rechercherNum(e.numLivre);
+        const retard = e.fin < td;
+        const j = diasLeft(e.fin);
+        return `<tr>
+          <td class="code">${e.numLivre}</td>
+          <td>${l ? l.titre : '—'}</td>
+          <td style="font-family:var(--font-m);font-size:0.75rem">${e.debut}</td>
+          <td style="font-family:var(--font-m);font-size:0.75rem;color:${retard?'var(--red)':'inherit'}">${e.fin}</td>
+          <td>${retard ? `<span class="badge br">+${Math.abs(j)}j retard</span>` : `<span class="badge bb">${j}j restants</span>`}</td>
+        </tr>`;
+      }).join('')}
+      </tbody>
+    </table></div></div>`;
+}
+
+// ============================================================
+// RETARDS
+// ============================================================
+function afficherRetards() {
+  const dateRef = document.getElementById('ret-date').value || today();
+  const div = document.getElementById('ret-result');
+
+  const retards = emprunts.toArray().filter(e => e.fin < dateRef);
+  if (!retards.length) {
+    div.innerHTML = `<div class="card" style="border-color:var(--green)"><div style="display:flex;align-items:center;gap:12px;color:var(--green)"><span style="font-size:2rem">✅</span><div><div style="font-size:1.1rem;font-weight:600">Aucun retard</div><div style="font-size:0.85rem;opacity:0.7">Tous les livres sont retournés à temps au ${dateRef}</div></div></div></div>`;
+    return;
+  }
+
+  const total = retards.reduce((s,e) => s + Math.ceil((new Date(dateRef)-new Date(e.fin))/86400000), 0);
+
+  div.innerHTML = `<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <span class="badge br" style="font-size:0.7rem;padding:6px 14px">${retards.length} retard(s)</span>
+    <span class="badge ba" style="font-size:0.7rem;padding:6px 14px">${total} jours cumulés</span>
+  </div>
+  <div class="card" style="padding:0"><div class="tw"><table>
+    <thead><tr><th>N° Livre</th><th>Titre</th><th>Étudiant</th><th>Retour prévu</th><th>Jours de retard</th><th>Action</th></tr></thead>
+    <tbody>
+    ${retards.map(e => {
+      const l = abr.rechercherNum(e.numLivre);
+      const diff = Math.ceil((new Date(dateRef)-new Date(e.fin))/86400000);
+      return `<tr>
+        <td class="code">${e.numLivre}</td>
+        <td>${l ? l.titre : '—'}</td>
+        <td>${e.nom} ${e.prenom} <span style="font-family:var(--font-m);font-size:0.6rem;color:var(--muted)">(${e.numEtudiant})</span></td>
+        <td style="font-family:var(--font-m);font-size:0.75rem;color:var(--red)">${e.fin}</td>
+        <td><span class="badge br">+${diff}j</span></td>
+        <td><button class="btn btn-d" style="padding:5px 10px;font-size:0.6rem" onclick="retourRapide(${e.numLivre},'${e.numEtudiant}');afficherRetards()">↩ Retour</button></td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table></div></div>`;
+}
+
+// ============================================================
+// IMPRESSION / PDF
+// ============================================================
+function openPrintModal() { document.getElementById('print-modal').classList.add('open'); }
+function closePrintModal() { document.getElementById('print-modal').classList.remove('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function printReport(type) {
+  closePrintModal();
+  const td = today();
+  let html = '';
+  const style = `<style>
+    body{font-family:Georgia,serif;color:#111;background:#fff;padding:32px;font-size:13px}
+    h1{font-size:22px;border-bottom:2px solid #c9a96e;padding-bottom:8px;color:#1a1a1a}
+    h2{font-size:16px;color:#c9a96e;margin-top:24px}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th{background:#f5f2ec;color:#555;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;padding:8px 12px;text-align:left;border:1px solid #ddd}
+    td{padding:8px 12px;border:1px solid #eee;font-size:12px}
+    tr:nth-child(even) td{background:#fafaf8}
+    .meta{color:#888;font-size:11px;margin-bottom:20px}
+    .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:bold}
+    .ok{background:#e8f8f0;color:#2a7a52}
+    .err{background:#fdecea;color:#c0392b}
+    .info{background:#e8f0fd;color:#2a4a7a}
+    footer{margin-top:40px;padding-top:16px;border-top:1px solid #ddd;color:#999;font-size:10px;text-align:center}
+  </style>`;
+
+  const header = (title) => `<html><head><title>${title}</title>${style}</head><body>
+    <h1>📚 Bibliothèque Universitaire — ${title}</h1>
+    <div class="meta">Université Aube Nouvelle · L2IT · Généré le ${new Date().toLocaleString('fr-FR')}</div>`;
+  const footer = `<footer>Système de gestion de bibliothèque — Mini-Projet Structures de Données Avancées · M. LOYA</footer></body></html>`;
+
+  if (type === 'catalogue') {
+    const livres = abr.infixe();
+    html = header('Catalogue des livres') +
+      `<h2>Livres enregistrés (${livres.length})</h2>
+      <table><thead><tr><th>N°</th><th>Titre</th><th>Auteur</th><th>Année</th><th>Exemplaires</th><th>Disponibles</th></tr></thead><tbody>
+      ${livres.map(l => `<tr><td>${l.numero}</td><td>${l.titre}</td><td>${l.nom} ${l.prenom}</td><td>${l.annee}</td><td>${l.exemplaires}</td><td>${getDisponibles(l.numero)}</td></tr>`).join('')}
+      </tbody></table>` + footer;
+  }
+
+  if (type === 'etudiants') {
+    html = header('Liste des étudiants') +
+      `<h2>Étudiants inscrits (${etudiants.length})</h2>
+      <table><thead><tr><th>N°</th><th>Nom</th><th>Prénom</th><th>Filière</th><th>Email</th><th>Emprunts actifs</th></tr></thead><tbody>
+      ${etudiants.map(e => {
+        const nb = emprunts.toArray().filter(em => em.numEtudiant === e.numero).length;
+        return `<tr><td>${e.numero}</td><td>${e.nom}</td><td>${e.prenom}</td><td>${e.filiere||'—'}</td><td>${e.email||'—'}</td><td>${nb}</td></tr>`;
+      }).join('')}
+      </tbody></table>` + footer;
+  }
+
+  if (type === 'emprunts') {
+    const emps = emprunts.toArray();
+    html = header('Emprunts en cours') +
+      `<h2>Emprunts actifs (${emps.length})</h2>
+      <table><thead><tr><th>N° Livre</th><th>Titre</th><th>Étudiant</th><th>N° Étudiant</th><th>Emprunt</th><th>Retour prévu</th><th>Statut</th></tr></thead><tbody>
+      ${emps.map(e => {
+        const l = abr.rechercherNum(e.numLivre);
+        const retard = e.fin < td;
+        return `<tr><td>${e.numLivre}</td><td>${l?l.titre:'—'}</td><td>${e.nom} ${e.prenom}</td><td>${e.numEtudiant}</td><td>${e.debut}</td><td>${e.fin}</td>
+          <td><span class="badge ${retard?'err':'ok'}">${retard?'RETARD':'En cours'}</span></td></tr>`;
+      }).join('')}
+      </tbody></table>` + footer;
+  }
+
+  if (type === 'retards') {
+    const retards = emprunts.toArray().filter(e => e.fin < td);
+    html = header('Rapport des retards') +
+      `<h2>Livres non retournés (${retards.length})</h2>
+      <table><thead><tr><th>N° Livre</th><th>Titre</th><th>Étudiant</th><th>Retour prévu</th><th>Jours de retard</th></tr></thead><tbody>
+      ${retards.map(e => {
+        const l = abr.rechercherNum(e.numLivre);
+        const diff = Math.ceil((new Date(td)-new Date(e.fin))/86400000);
+        return `<tr><td>${e.numLivre}</td><td>${l?l.titre:'—'}</td><td>${e.nom} ${e.prenom} (${e.numEtudiant})</td><td style="color:#c0392b">${e.fin}</td><td><strong>+${diff} j</strong></td></tr>`;
+      }).join('')}
+      </tbody></table>` + footer;
+  }
+
+  if (type === 'complet') {
+    const livres = abr.infixe();
+    const emps = emprunts.toArray();
+    const retards = emps.filter(e => e.fin < td);
+    let dispo = 0;
+    livres.forEach(l => { dispo += getDisponibles(l.numero); });
+
+    html = header('Rapport général') +
+      `<table style="width:auto;margin-bottom:24px"><tr>
+        <td style="padding:10px 20px;background:#f5f2ec;text-align:center"><div style="font-size:22px;font-weight:bold;color:#c9a96e">${livres.length}</div><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#888">Livres</div></td>
+        <td style="padding:10px 20px;background:#f0faf5;text-align:center"><div style="font-size:22px;font-weight:bold;color:#2a7a52">${etudiants.length}</div><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#888">Étudiants</div></td>
+        <td style="padding:10px 20px;background:#eef4fe;text-align:center"><div style="font-size:22px;font-weight:bold;color:#2a4a7a">${emps.length}</div><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#888">Emprunts</div></td>
+        <td style="padding:10px 20px;background:#fdecea;text-align:center"><div style="font-size:22px;font-weight:bold;color:#c0392b">${retards.length}</div><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#888">Retards</div></td>
+      </tr></table>
+      <h2>Catalogue</h2>
+      <table><thead><tr><th>N°</th><th>Titre</th><th>Auteur</th><th>Année</th><th>Dispo</th></tr></thead><tbody>
+      ${livres.map(l => `<tr><td>${l.numero}</td><td>${l.titre}</td><td>${l.nom} ${l.prenom}</td><td>${l.annee}</td><td>${getDisponibles(l.numero)}/${l.exemplaires}</td></tr>`).join('')}
+      </tbody></table>
+      <h2>Emprunts en cours</h2>
+      <table><thead><tr><th>Livre</th><th>Étudiant</th><th>Retour prévu</th><th>Statut</th></tr></thead><tbody>
+      ${emps.map(e => {
+        const l = abr.rechercherNum(e.numLivre);
+        const retard = e.fin < td;
+        return `<tr><td>${l?l.titre:e.numLivre}</td><td>${e.nom} ${e.prenom}</td><td>${e.fin}</td><td><span class="badge ${retard?'err':'ok'}">${retard?'RETARD':'En cours'}</span></td></tr>`;
+      }).join('')}
+      </tbody></table>` + footer;
+  }
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  win.onload = () => { win.print(); };
+}
+
+// ============================================================
+// DÉMO
+// ============================================================
+function loadDemo() {
+  const livres = [
+    {numero:50,titre:'Introduction aux algorithmes',nom:'Cormen',prenom:'Thomas',annee:2009,exemplaires:3,desc:'Référence mondiale en algorithmique'},
+    {numero:25,titre:'Structures de données en C',nom:'Sedgewick',prenom:'Robert',annee:2011,exemplaires:2,desc:''},
+    {numero:75,titre:'Le langage C',nom:'Kernighan',prenom:'Brian',annee:1988,exemplaires:4,desc:'Le livre original par les créateurs du C'},
+    {numero:15,titre:'Analyse numérique',nom:'Sauer',prenom:'Timothy',annee:2012,exemplaires:1,desc:''},
+    {numero:60,titre:'Programmation orientée objet',nom:'Booch',prenom:'Grady',annee:2007,exemplaires:2,desc:''},
+    {numero:30,titre:'Bases de données relationnelles',nom:'Ramakrishnan',prenom:'Raghu',annee:2014,exemplaires:3,desc:''},
+    {numero:90,titre:'Réseaux informatiques',nom:'Tanenbaum',prenom:'Andrew',annee:2010,exemplaires:2,desc:''},
+    {numero:10,titre:'Mathématiques discrètes',nom:'Rosen',prenom:'Kenneth',annee:2018,exemplaires:2,desc:''},
+    {numero:40,titre:'Systèmes d\'exploitation',nom:'Silberschatz',prenom:'Abraham',annee:2018,exemplaires:2,desc:''},
+    {numero:80,titre:'Génie logiciel',nom:'Sommerville',prenom:'Ian',annee:2016,exemplaires:1,desc:''},
+  ];
+
+  const etudiantsDemo = [
+    {numero:'20230001',nom:'Sawadogo',prenom:'Ali',filiere:'L2IT',email:'ali.sawadogo@univ.bf',tel:'+226 70000001'},
+    {numero:'20230002',nom:'Ouedraogo',prenom:'Fatima',filiere:'L2IT',email:'fatima.o@univ.bf',tel:'+226 70000002'},
+    {numero:'20230003',nom:'Traore',prenom:'Moussa',filiere:'L2IT',email:'moussa.t@univ.bf',tel:'+226 70000003'},
+    {numero:'20230004',nom:'Zongo',prenom:'Aïcha',filiere:'L2IT',email:'aicha.z@univ.bf',tel:'+226 70000004'},
+    {numero:'20230005',nom:'Kabore',prenom:'Jean',filiere:'L2IT',email:'jean.k@univ.bf',tel:'+226 70000005'},
+  ];
+
+  let lc = 0, ec = 0;
+  livres.forEach(l => { if (abr.inserer(l)) lc++; });
+  etudiantsDemo.forEach(e => { if (!etudiants.find(x => x.numero === e.numero)) { etudiants.push(e); ec++; }});
+
+  const td = today();
+  const fmtPlus = (days) => { const d = new Date(td); d.setDate(d.getDate()+days); return d.toISOString().split('T')[0]; };
+  const fmtMinus = (days) => { const d = new Date(td); d.setDate(d.getDate()-days); return d.toISOString().split('T')[0]; };
+
+  emprunts.ajouter({numLivre:50,numEtudiant:'20230001',nom:'Sawadogo',prenom:'Ali',debut:fmtMinus(3),fin:fmtPlus(11)});
+  emprunts.ajouter({numLivre:25,numEtudiant:'20230002',nom:'Ouedraogo',prenom:'Fatima',debut:fmtMinus(18),fin:fmtMinus(4)});
+  emprunts.ajouter({numLivre:75,numEtudiant:'20230003',nom:'Traore',prenom:'Moussa',debut:fmtMinus(1),fin:fmtPlus(13)});
+  emprunts.ajouter({numLivre:30,numEtudiant:'20230004',nom:'Zongo',prenom:'Aïcha',debut:fmtMinus(22),fin:fmtMinus(8)});
+  emprunts.ajouter({numLivre:10,numEtudiant:'20230005',nom:'Kabore',prenom:'Jean',debut:td,fin:fmtPlus(14)});
+
+  document.getElementById('ret-date').value = td;
+  sauvegarder();
+  updateDashboard();
+  toast(`⚡ Démo: ${lc} livres, ${ec} étudiants chargés`, 'ok');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('em-debut').value = today();
+  document.getElementById('ret-date').value = today();
+  chargerDepuisStorage();
+  updateDashboard();
+
+  // Fermer modals sur clic extérieur
+  document.querySelectorAll('.mbg').forEach(m => {
+    m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('open'); });
+  });
+
+  // Auto-save toutes les 30s
+  setInterval(sauvegarder, 30000);
+});
+</script>
+</body>
+</html>
